@@ -1,0 +1,19 @@
+[package]
+authors = ["Alex Grinman <alex@krypt.co>"]
+name = "dashboard_yew"
+version = "0.1.0"
+
+[dependencies]
+chrono = "0.4"
+http = "0.1.4"
+serde = "1"
+serde_derive = "1"
+serde_json = "*"
+stdweb = "*"
+time = "0.1"
+
+[dependencies.sigchain_core]
+path = "../sigchain_core"
+
+[dependencies.yew]
+git = "https://github.com/kryptco/yew.git"

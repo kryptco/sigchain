@@ -1,0 +1,1 @@
+no-comp no-hw no-engine no-shared no-ssl2 no-ssl3 no-dtls1 no-ui no-makedepend

@@ -1,0 +1,1 @@
+DROP TABLE current_team

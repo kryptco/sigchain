@@ -1,0 +1,21 @@
+[workspace]
+members = ["sigchain_core", "sigchain_client", "dashboard_yew", "dashboard_middleware", "libsigchain"]
+
+# configure whether statically linked with ARCH_ env vars
+[replace."pq-sys:0.4.4"]
+default-features = false
+git = "https://github.com/kryptco/pq-sys"
+
+[target."cfg(target_os=\"android\")".dependencies.jni]
+default-features = false
+git = "https://github.com/prevoty/jni-rs"
+
+[replace."openssl:0.9.23"]
+git = "https://github.com/kryptco/rust-openssl"
+
+[replace]
+"diesel:1.1.1" = { git = "https://github.com/diesel-rs/diesel" }
+"diesel_derives:1.1.0" = { git = "https://github.com/diesel-rs/diesel" }
+"diesel_migrations:1.1.0" = { git = "https://github.com/diesel-rs/diesel" }
+"migrations_internals:1.1.0" = { git = "https://github.com/diesel-rs/diesel" }
+"migrations_macros:1.1.0" = { git = "https://github.com/diesel-rs/diesel" }

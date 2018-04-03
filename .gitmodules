@@ -1,0 +1,8 @@
+[submodule "libsodium"]
+	path = libsodium
+	url = https://github.com/jedisct1/libsodium
+	branch = stable
+[submodule "openssl"]
+	path = openssl
+	url = https://github.com/openssl/openssl
+	branch = OpenSSL_1_1_0g

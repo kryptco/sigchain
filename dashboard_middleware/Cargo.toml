@@ -1,0 +1,44 @@
+[package]
+authors = ["Kevin King <kevin@krypt.co>"]
+name = "dashboard_middleware"
+version = "0.1.0"
+
+[[bin]]
+name = "middleware_runner"
+path = "src/bin.rs"
+
+[build-dependencies]
+includedir_codegen = "0.2.0"
+walkdir = "2.1.0"
+
+[dependencies]
+base64 = "0.6.0"
+dotenv = "0.10.1"
+env_logger = "0.5.4"
+error-chain = "0.11.0"
+hyper = "0.10.13"
+includedir = "0.2.0"
+iron = "0.6.0"
+iron-cors = "0.7.0"
+lazy_static = "1.0.0"
+log = "0.4.1"
+percent-encoding = "1.0.1"
+phf = "0.7.12"
+serde = "1.0.9"
+serde_derive = "1.0.9"
+serde_json = "1.0.9"
+
+[target."cfg(target_os=\"linux\")".dependencies.openssl-probe]
+version = "0.1.2"
+
+[dependencies.sigchain_client]
+features = ["network_client"]
+path = "../sigchain_client"
+
+[dependencies.sigchain_core]
+features = ["sqlite", "crypto", "hyper"]
+path = "../sigchain_core"
+
+[lib]
+name = "dashboard_middleware"
+path = "src/lib.rs"

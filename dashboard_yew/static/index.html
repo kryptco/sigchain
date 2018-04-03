@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+	<head>
+		<title>Krypton Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="Content-Style-Type" content="text/css">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" href="img/favicon.png">
+
+        <link rel="stylesheet" href='lib/fonts/Lato/font_lato.css' />
+        <link rel="stylesheet" href='lib/fonts/Montserrat/font_montserrat.css' />
+        <link rel="stylesheet" href='lib/fonts/Karla/font_karla.css' />
+        <link rel="stylesheet" href='lib/fonts/SourceCodePro/font_sourcecodepro.css' />
+
+        <link rel="stylesheet" type="text/css" href="css/main.css">
+        <link rel="stylesheet" type="text/css" href="css/main-plus.css">
+
+        <link rel="stylesheet" href="lib/chartist/chartist.min.css">
+        <script type="application/javascript" src="js/index.js"></script>
+        <script>
+            var chart = null;
+        </script>
+        <script>
+            //https://stackoverflow.com/questions/47879864/how-can-i-check-if-a-browser-supports-webassembly
+            const wasmSupported = (() => {
+                try {
+                    if (typeof WebAssembly === "object"
+                        && typeof WebAssembly.instantiate === "function") {
+                        const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+                        if (module instanceof WebAssembly.Module)
+                            return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+                    }
+                } catch (e) {
+                }
+                return false;
+            })();
+
+            if (!wasmSupported) {
+                alert("The Krypton Dashboard requires a newer version of your browser. The Krypton Dashboard needs WebAssembly (WASM) support. Please update your browser to continue.");
+            } else {
+                console.log("wasm support available.")
+            }
+        </script>
+    </head>
+	<body onload="">
+        <div id="loading-page" class="load">
+            <div class="details">
+                <div id="shield-outline">
+                    <svg width="112px" viewBox="0 0 235 263" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="krypton-outline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <ellipse id="Oval-Copy-2" stroke="#F5F5F5" stroke-width="5" cx="117.459075" cy="126.115385"
+                                     rx="44.0057251" ry="43.9615384"></ellipse>
+                            <path d="M117.5,0 C194.130435,0 235,50.576923 235,50.576923 L235,166.903846 C235,232.653846 148.152174,257.942308 117.5,263 L117.5,0 L117.5,0 Z M117.5,4.00000507 C190.816502,4.01817036 229.918151,52.8461538 229.918151,52.8461538 L229.918151,165.192308 C229.918151,228.662806 146.873444,253.092682 117.5,257.993179 L117.5,263 C86.847826,257.942308 -1.89747208e-14,232.653846 0,166.903846 C1.89747208e-14,101.153846 0,101.15385 0,50.576923 C-1.89747208e-14,50.576923 40.8695651,0 117.5,0 L117.5,4.00000507 Z M117.459075,183.997531 L117.459075,68.002469 C85.6756575,68.2928441 60,94.1479865 60,126 C60,157.852014 85.6756575,183.707156 117.459075,183.99753 Z M117.5,4.00000507 C117.48636,4.00000169 117.472718,4 117.459075,4 L117.459075,68.002469 C117.472716,68.0023454 117.486357,68.0022255 117.5,68.0021103 L117.5,183.99789 C117.486357,183.997774 117.472716,183.997655 117.459075,183.99753 L117.459075,258 C117.472705,257.997731 117.486347,257.995457 117.5,257.993179 L117.5,183.99789 C117.6665,183.999296 117.833168,184 118,184 C150.032515,184 176,158.032515 176,126 C176,93.9674845 150.032515,68 118,68 C117.833168,68 117.6665,68.0007044 117.5,68.0021103 L117.5,4.00000507 Z M117.459075,62.6153847 C152.564407,62.6153847 181.0229,91.0453031 181.0229,126.115385 C181.0229,161.185466 152.564407,189.615385 117.459075,189.615385 L117.459075,258 C88.1219252,253.115385 5,228.692308 5,165.192308 C5,101.692308 5,101.692312 5,52.8461538 C5,52.8461538 44.1162001,4 117.459075,4 L117.459075,62.6153847 Z M117.459075,62.6153847 C82.3537441,62.6153847 53.8952502,91.0453031 53.8952502,126.115385 C53.8952502,161.185466 82.3537441,189.615385 117.459075,189.615385 L117.459075,62.6153847 Z"
+                                  id="Combined-Shape" fill="#F5F5F5"></path>
+                        </g>
+                    </svg>
+                </div>
+                <div id="fill-shield">
+                    <svg width="103px" height="116px" viewBox="0 0 103 116" version="1.1">
+                        <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+                        <title>Krypton Icon</title>
+                        <desc>Created with Sketch.</desc>
+                        <defs>
+                            <mask id="cut-ellipse">
+                                <path d="M51.2418137,0 C84.6603878,0 102.483627,22.305676 102.483627,22.305676 L102.483627,73.6087307 C102.483627,102.606109 64.6092433,113.758947 51.2418137,115.989515 L51.2418137,0 L51.2418137,0 Z M51.2418137,0 C17.8232394,0 -8.27488601e-15,22.305676 0,22.305676 C0,44.6113537 8.27488601e-15,44.611352 0,73.6087307 C-8.27488601e-15,102.606109 37.874384,113.758947 51.2418137,115.989515 L51.2418137,0 L51.2418137,0 Z"
+                                      fill="white"/>
+                                <ellipse fill="black" cx="51.2418137" cy="55.6658938" rx="28.9627643" ry="28.9973788"/>
+                                <ellipse fill="white" cx="51.2418137" cy="55.6658938" rx="20.0511444" ry="20.0751084"/>
+                            </mask>
+                            <!-- https://css-tricks.com/gooey-effect/ -->
+                            <filter id="fancy-goo">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+                                <feColorMatrix in="blur" mode="matrix"
+                                               values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo"/>
+                                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+                            </filter>
+                        </defs>
+                        <g id="krypton" mask="url(#cut-ellipse)">
+                            <g id="progress">
+                                <g id="blobs" rx="7px" ry="7px">
+                                    <rect width="15px" height="120%"/>
+                                    <rect width="15px" height="116%" x="15px"/>
+                                    <rect width="15px" height="118%" x="30px"/>
+                                    <rect width="15px" height="126%" x="45px"/>
+                                    <rect width="15px" height="122%" x="60px"/>
+                                    <rect width="15px" height="124%" x="75px"/>
+                                    <rect width="15px" height="118%" x="90px"/>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div id="load-status">Loading Team Data</div>
+            </div>
+        </div>
+        <script>
+            setTimeout(startSplashLoading, 100);
+        </script>
+        <!--char lib-->
+        <script type="application/javascript", src="lib/chartist/chartist.min.js",></script>
+
+        <div class="app"></div>
+        <script src="dashboard_yew.js"></script>
+	</body>
+</html>

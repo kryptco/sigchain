@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="17px" viewBox="0 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/warning</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="RightPanel/Profile" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-137.000000, -332.000000)">
+        <g id="Group-3" transform="translate(20.000000, 273.000000)">
+            <g id="User" transform="translate(0.000000, 53.000000)">
+                <g id="icon/warning" transform="translate(116.000000, 5.000000)">
+                    <path d="M4.32180989,18 C3.83249154,18 3.35060038,17.8803098 2.91814673,17.6513637 C1.45383896,16.876142 0.895224383,15.0606446 1.67044614,13.5963368 L7.34863625,2.87086663 C7.63005692,2.33929426 8.06476447,1.90458671 8.59633684,1.62316604 C10.0606446,0.847944285 11.876142,1.40655887 12.6513637,2.87086663 L18.3295539,13.5963368 C18.5584999,14.0287905 18.6781901,14.5106816 18.6781901,15 C18.6781901,16.6568542 17.3350444,18 15.6781901,18 L4.32180989,18 Z" id="Path-9" fill="#F8A843" fill-rule="nonzero"></path>
+                    <g id="Group-3" stroke-width="1" fill-rule="evenodd" transform="translate(9.000000, 6.000000)" fill="#FFFFFF">
+                        <rect id="Rectangle-23" x="0" y="0" width="2" height="6" rx="1"></rect>
+                        <rect id="Rectangle-23-Copy" x="0" y="7" width="2" height="2" rx="1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

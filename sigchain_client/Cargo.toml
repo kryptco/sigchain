@@ -1,0 +1,87 @@
+[package]
+authors = ["Kevin King <kevin@krypt.co>"]
+name = "sigchain_client"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib", "rlib", "staticlib"]
+name = "sigchain_client"
+
+[[bin]]
+name = "block_validator"
+required-features = ["network_client"]
+
+[dependencies]
+backoff = "0.1.2"
+base64 = "0.6.0"
+byteorder = "1.1.0"
+clap = "2.26.0"
+colored = "1.5.2"
+crc24 = "0.1.6"
+dotenv = "0.9.0"
+env_logger = "0.4.3"
+error-chain = "^0.11.0"
+futures = "0.1.14"
+hyper = "0.11.1"
+itertools = "0.7.6"
+lazy_static = "0.2.8"
+log = "0.3.8"
+rand = "0.3.16"
+scopeguard = "0.3.2"
+serde = "1.0.9"
+serde_derive = "1.0.9"
+serde_json = "1.0.2"
+time = "0.1.38"
+tokio-core = "0.1.9"
+url = "1.6.0"
+
+[dependencies.chrono]
+features = ["serde"]
+version = "0.4.0"
+
+[dependencies.sigchain_core]
+path = "../sigchain_core"
+
+[dependencies.diesel]
+optional = true
+version = "1.1.1"
+
+[dependencies.hyperlocal]
+optional = true
+version = "0.4.1"
+
+[dependencies.libsodium-sys]
+git = "https://github.com/dnaq/sodiumoxide"
+
+[dependencies.reqwest]
+optional = true
+version = "0.7.2"
+
+[dependencies.semver]
+features = ["serde"]
+version = "0.9.0"
+
+[dependencies.sodiumoxide]
+git = "https://github.com/dnaq/sodiumoxide"
+
+[dependencies.users]
+optional = true
+version = "0.6.0"
+
+[features]
+android_client = ["reqwest", "sigchain_core/reqwest", "sigchain_core/sqlite", "sigchain_core/crypto", "sigchain_core/ssh-wire"]
+network_client = ["reqwest", "sigchain_core/reqwest", "hyperlocal", "users", "sigchain_core/sqlite", "sigchain_core/krd_client", "sigchain_core/ssh-wire", "sigchain_core/crypto", "sigchain_core/hyper"]
+default = ["network_client"]
+lambda = ["sigchain_core/pg", "sigchain_core/crypto", "sigchain_core/ssh-wire"]
+
+[replace]
+
+[replace."openssl:0.9.23"]
+git = "https://github.com/kryptco/rust-openssl"
+
+[replace."pq-sys:0.4.4"]
+default-features = false
+git = "https://github.com/kryptco/pq-sys"
+
+[replace."ring:0.12.1"]
+git = "https://github.com/kryptco/ring"

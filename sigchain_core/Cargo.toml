@@ -1,0 +1,74 @@
+[package]
+authors = ["Kevin King <kevin@krypt.co>"]
+name = "sigchain_core"
+version = "0.1.0"
+
+[dependencies]
+base64 = "0.6.0"
+byteorder = "1.2.1"
+crc24 = "0.1.6"
+dotenv = "^0.10"
+error-chain = "^0.11.0"
+lazy_static = "1.0.0"
+log = "0.3.8"
+rand = "0.3.16"
+scopeguard = "0.3.2"
+serde = "1.0.9"
+serde_derive = "1.0.9"
+serde_json = "1.0.2"
+time = "0.1.39"
+url = "1.6.0"
+sha1 = "0.5.0"
+
+[dependencies.chrono]
+features = ["serde"]
+version = "0.4.0"
+
+[dependencies.diesel]
+features = ["chrono"]
+optional = true
+version = "^1.1"
+
+[dependencies.diesel_migrations]
+optional = true
+version = "^1.1"
+
+[dependencies.hyper]
+optional = true
+version = "0.11.1"
+
+[dependencies.libsodium-sys]
+git = "https://github.com/dnaq/sodiumoxide"
+optional = true
+
+[dependencies.libsqlite3-sys]
+version = "0.9.1"
+optional = true
+features = ["bundled"]
+
+[dependencies.reqwest]
+optional = true
+version = "0.7.2"
+
+[dependencies.semver]
+features = ["serde"]
+version = "0.9.0"
+
+[dependencies.sodiumoxide]
+git = "https://github.com/dnaq/sodiumoxide"
+optional = true
+
+[dependencies.ssh-wire]
+git = "https://github.com/kryptco/ssh-wire"
+optional = true
+
+[target."cfg(target_os=\"android\")".dependencies.jni]
+default-features = false
+git = "https://github.com/prevoty/jni-rs"
+
+[features]
+crypto = ["libsodium-sys", "sodiumoxide"]
+db = ["diesel", "diesel_migrations"]
+krd_client = []
+pg = ["db", "diesel/postgres"]
+sqlite = ["db", "diesel/sqlite", "libsqlite3-sys"]
