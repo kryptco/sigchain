@@ -6,7 +6,7 @@ cross/$(LINUX_PAIR)/lib/libsodium.a:
 	cd libsodium && ./configure --prefix=${PWD}/cross/$(LINUX_PAIR) && make clean && make && make install
 
 cross/$(LINUX_PAIR)/lib/libssl.a:
-	cd openssl && ./config -fPIC --prefix=${PWD}/cross/$(LINUX_PAIR) && make clean && make -j depend && make -j build_generated && make libcrypto.a libssl.a && make install
+	cd openssl && ./config -fPIC --prefix=${PWD}/cross/$(LINUX_PAIR) && make clean && make --quiet -j depend && make --quiet -j build_generated && make --quiet libcrypto.a libssl.a && make --quiet install
 
 OPENSSL_DEP=cross/$(LINUX_PAIR)/lib/libssl.a
 OPENSSL_FLAGS=OPENSSL_DIR=${PWD}/cross/$(LINUX_PAIR) OPENSSL_STATIC=1
