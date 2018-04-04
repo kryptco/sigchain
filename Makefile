@@ -5,6 +5,12 @@ LINUX_PAIR=linux-$(shell uname -m)
 cross/$(LINUX_PAIR)/lib/libsodium.a:
 	cd libsodium && ./configure --prefix=${PWD}/cross/$(LINUX_PAIR) && make clean && make && make install
 
+cross/$(LINUX_PAIR)/lib/libssl.a:
+	cd openssl && ./config -fPIC --prefix=${PWD}/cross/$(LINUX_PAIR) && make clean && make -j depend && make -j build_generated && make libcrypto.a libssl.a && make install
+
+OPENSSL_DEP=cross/$(LINUX_PAIR)/lib/libssl.a
+OPENSSL_FLAGS=OPENSSL_DIR=${PWD}/cross/$(LINUX_PAIR) OPENSSL_STATIC=1
+
 SODIUM_DEP=cross/$(LINUX_PAIR)/lib/libsodium.a
 SODIUM_FLAGS=SODIUM_STATIC=1 SODIUM_LIB_DIR=${PWD}/cross/$(LINUX_PAIR)/lib
 endif
@@ -13,13 +19,13 @@ ifeq ($(UNAME_S),Darwin)
 SODIUM_FLAGS=SODIUM_STATIC=1 SODIUM_LIB_DIR="`PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 pkg-config --static libsodium --libs-only-L | tail -c +3`" 
 endif
 
-libsigchain-with-dashboard: $(SODIUM_DEP)
+libsigchain-with-dashboard: $(SODIUM_DEP) $(OPENSSL_DEP)
 	# use rsync so that file modifed times are only updated when the contents change
 	cd dashboard_yew && cargo web deploy --release --target=wasm32-unknown-emscripten && rsync --checksum --delete -r target/deploy/* target/deploy-final
-	cd libsigchain && $(SODIUM_FLAGS) cargo build ${CARGO_RELEASE}
+	cd libsigchain && $(SODIUM_FLAGS) $(OPENSSL_FLAGS) cargo build ${CARGO_RELEASE}
 
 check-libsigchain-with-dashboard: libsigchain-with-dashboard
-	DATABASE_URL=test.db $(SODIUM_FLAGS) cargo test ${CARGO_RELEASE} -- --test-threads=1
+	DATABASE_URL=test.db $(SODIUM_FLAGS) $(OPENSSL_FLAGS) cargo test ${CARGO_RELEASE} -- --test-threads=1
 
 AARCH64_LINUX_ANDROID_PREFIX=${ANDROID_NDK}/arm64/bin/aarch64-linux-android-
 ANDROID_AARCH64_ENV=LDFLAGS="-ldl ${LDFLAGS}" CXX=${AARCH64_LINUX_ANDROID_PREFIX}g++ CC=${AARCH64_LINUX_ANDROID_PREFIX}gcc AR=${AARCH64_LINUX_ANDROID_PREFIX}ar STRIP=${AARCH64_LINUX_ANDROID_PREFIX}strip NM=${AARCH64_LINUX_ANDROID_PREFIX}nm RANLIB=${AARCH64_LINUX_ANDROID_PREFIX}ranlib CCLD=${AARCH64_LINUX_ANDROID_PREFIX}gcc _ANDROID_EABI=aarch64-linux-android-4.9 _ANDROID_ARCH=aarch64 _ANDROID_API=26 INCLUDE_PATH="" CPP_INCLUDE_PATH="" 
