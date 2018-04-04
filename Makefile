@@ -19,7 +19,7 @@ libsigchain-with-dashboard: $(SODIUM_DEP)
 	cd libsigchain && $(SODIUM_FLAGS) cargo build ${CARGO_RELEASE}
 
 check-libsigchain-with-dashboard: libsigchain-with-dashboard
-	$(SODIUM_FLAGS) cargo test ${CARGO_RELEASE} -- --test-threads=1
+	DATABASE_URL=test.db $(SODIUM_FLAGS) cargo test ${CARGO_RELEASE} -- --test-threads=1
 
 AARCH64_LINUX_ANDROID_PREFIX=${ANDROID_NDK}/arm64/bin/aarch64-linux-android-
 ANDROID_AARCH64_ENV=LDFLAGS="-ldl ${LDFLAGS}" CXX=${AARCH64_LINUX_ANDROID_PREFIX}g++ CC=${AARCH64_LINUX_ANDROID_PREFIX}gcc AR=${AARCH64_LINUX_ANDROID_PREFIX}ar STRIP=${AARCH64_LINUX_ANDROID_PREFIX}strip NM=${AARCH64_LINUX_ANDROID_PREFIX}nm RANLIB=${AARCH64_LINUX_ANDROID_PREFIX}ranlib CCLD=${AARCH64_LINUX_ANDROID_PREFIX}gcc _ANDROID_EABI=aarch64-linux-android-4.9 _ANDROID_ARCH=aarch64 _ANDROID_API=26 INCLUDE_PATH="" CPP_INCLUDE_PATH="" 
