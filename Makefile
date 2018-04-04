@@ -18,6 +18,9 @@ libsigchain-with-dashboard: $(SODIUM_DEP)
 	cd dashboard_yew && cargo web deploy --release --target=wasm32-unknown-emscripten && rsync --checksum --delete -r target/deploy/* target/deploy-final
 	cd libsigchain && $(SODIUM_FLAGS) cargo build ${CARGO_RELEASE}
 
+check-libsigchain-with-dashboard: libsigchain-with-dashboard
+	$(SODIUM_FLAGS) cargo test ${CARGO_RELEASE} -- --test-threads=1
+
 AARCH64_LINUX_ANDROID_PREFIX=${ANDROID_NDK}/arm64/bin/aarch64-linux-android-
 ANDROID_AARCH64_ENV=LDFLAGS="-ldl ${LDFLAGS}" CXX=${AARCH64_LINUX_ANDROID_PREFIX}g++ CC=${AARCH64_LINUX_ANDROID_PREFIX}gcc AR=${AARCH64_LINUX_ANDROID_PREFIX}ar STRIP=${AARCH64_LINUX_ANDROID_PREFIX}strip NM=${AARCH64_LINUX_ANDROID_PREFIX}nm RANLIB=${AARCH64_LINUX_ANDROID_PREFIX}ranlib CCLD=${AARCH64_LINUX_ANDROID_PREFIX}gcc _ANDROID_EABI=aarch64-linux-android-4.9 _ANDROID_ARCH=aarch64 _ANDROID_API=26 INCLUDE_PATH="" CPP_INCLUDE_PATH="" 
 ANDROID_AARCH64_CARGO_FLAGS=CC_aarch64_linux_android=${AARCH64_LINUX_ANDROID_PREFIX}gcc AR_aarch64_linux_android=${AARCH64_LINUX_ANDROID_PREFIX}ar
