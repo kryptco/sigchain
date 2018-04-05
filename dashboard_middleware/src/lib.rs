@@ -65,7 +65,7 @@ mod static_files {
     include!(concat!(env!("OUT_DIR"), "/dashboard_frontend.rs"));
 }
 
-const DASHBOARD_ASSETS_PATH : &'static str = "../dashboard_yew/target/deploy-final";
+const DASHBOARD_ASSETS_PATH : &'static str = "../target/deploy-final";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Params {

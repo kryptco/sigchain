@@ -5,7 +5,7 @@ fn main() {
     include_client_web_files()
 }
 
-const DASHBOARD_YEW_DEPLOY_PATH : &'static str = "../dashboard_yew/target/deploy-final";
+const DASHBOARD_YEW_DEPLOY_PATH : &'static str = "../target/deploy-final";
 
 fn include_client_web_files() {
     for entry in walkdir::WalkDir::new(DASHBOARD_YEW_DEPLOY_PATH).into_iter().filter_map(|e| e.ok()) {
