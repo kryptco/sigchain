@@ -424,29 +424,30 @@ pub mod c_api {
                             let host:String = signature.clone().host_authorization.map(|h| h.host).unwrap_or("unknown host".into());
 
                             log_type = "SSH".into();
-                            log_body_string = format!("{:110}", format!("{} @ {}", signature.user, host).yellow()).into();
+                            log_body_string = format!("{} @ {}", signature.user, host).yellow().to_string();
 
                         },
                         LogBody::GitCommit(ref commit) => {
                             let message:String = commit.clone().message_string.unwrap_or("unknown".into());
 
                             log_type = "Git".into();
-                            log_body_string = format!("#{:17}\"{}\"", commit.git_hash_short_hex_string().unwrap_or("?".into()), message).into();
+                            log_body_string = format!("[{}] {}", commit.git_hash_short_hex_string().unwrap_or("?".into()), message.trim()).into();
                         },
                         logs::LogBody::GitTag(ref tag) => {
                             let cloned_tag = tag.clone();
                             let message:String = cloned_tag.message_string.unwrap_or("unknown".into());
 
                             log_type = "Git".into();
-                            log_body_string = format!("Tag {:14}\"{}\"", cloned_tag.tag, message).into();
+                            log_body_string = format!("Tag {}: {}", cloned_tag.tag, message).into();
                         }
                     };
 
-                    let log_string = format!("{:110}    {:30}    {:30}    |Device: {}|",
-                                             log_body_string,
+                    let log_string = format!("{:18}    {:30}    Device: {:20}    {}",
                                              log.unix_seconds.full_timestamp(),
                                              email,
-                                             log.session.device_name);
+                                             log.session.device_name,
+                                             log_body_string,
+                                             );
 
                     if log.body.is_success() {
                         println!("{}", format!("[{}]\t✔\t{}", log_type, log_string).green());
