@@ -221,7 +221,7 @@ pub struct Profile {
     #[serde(rename = "public_key_wire", with = "b64data")]
     pub ssh_wire_public_key: Vec<u8>,
     pub email: String,
-    #[serde(rename = "pgp_pk", with = "b64data::option")]
+    #[serde(rename = "pgp_pk", with = "b64data::option", default)]
     pub pgp_public_key: Option<Vec<u8>>,
     pub team_checkpoint: Option<TeamCheckpoint>,
 }

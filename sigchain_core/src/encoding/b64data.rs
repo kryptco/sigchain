@@ -22,6 +22,8 @@ where D: Deserializer<'de>
     Ok(base64::decode(&b64).map_err(serde::de::Error::custom)?) 
 }
 
+/// Encodes an Option<Vec<u8>> as a base64 encoded string. When used with JSON, add the
+/// #[serde(default)] attribute as well.
 pub mod option {
     extern crate base64;
     extern crate serde;

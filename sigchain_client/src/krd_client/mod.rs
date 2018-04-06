@@ -104,6 +104,8 @@ fn daemon_control_request<R: serde::de::DeserializeOwned>(request: hyper::Reques
         .request(request).from_err::<errors::Error>()
         .and_then(|res| {
             res.body().concat2().from_err().and_then(move |body| {
+                use std::string::String;
+                debug!("Response from krd: {}", String::from_utf8_lossy(&body));
                 Ok(serde_json::from_slice::<R>(&body)?)
             })
         });

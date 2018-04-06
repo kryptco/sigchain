@@ -52,7 +52,7 @@ pub struct HostAuthorization {
     pub host: String,
     #[serde(with = "b64data")]
     pub public_key: Vec<u8>,
-    #[serde(with = "b64data::option")]
+    #[serde(with = "b64data::option", default)]
     pub signature: Option<Vec<u8>>,
 }
 

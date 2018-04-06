@@ -515,6 +515,7 @@ pub mod c_api {
     extern crate openssl_probe;
 
     fn do_with_delegated_network_cli<F: Fn(&DelegatedNetworkClient) -> Result<()>>(f: F) {
+        let _ = env_logger::init();
         #[cfg(target_os="linux")]
         {
             openssl_probe::init_ssl_cert_env_vars();
