@@ -140,6 +140,12 @@ impl LogBlock {
             .filter(log_blocks::member_public_key.eq(member_public_key))
             .find(hash).first::<Self>(conn)
     }
+    pub fn filter_by_member(conn: &TeamDBConnection, member_public_key: &[u8]) -> QueryResult<Vec<Self>> {
+        Self::table()
+            .filter(log_blocks::team_public_key.eq(conn.team))
+            .filter(log_blocks::member_public_key.eq(member_public_key))
+            .get_results(conn.conn)
+    }
     pub fn find_next(conn: &TeamDBConnection, member_public_key: &[u8], last_block_hash: &Option<Vec<u8>>) -> QueryResult<Option<Self>> {
         let log_chain_filter = Self::table().filter(log_blocks::team_public_key.eq(conn.team))
             .filter(log_blocks::member_public_key.eq(member_public_key));
