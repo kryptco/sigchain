@@ -126,6 +126,7 @@ impl Client for DelegatedNetworkClient {
     }
 
     fn update_team_blocks(&self) -> Result<()> {
+        info!("updating team blocks");
         while self.read_next_block()?.more {}
         if db::Block::find(self.db_conn(), &self.public_key_and_checkpoint.last_block_hash).optional()?.is_none() {
             use sigchain_core;
@@ -345,6 +346,8 @@ impl DelegatedNetworkClient {
 
     // Returns false if there are more results, but the limit was reached
     pub fn update_team_log_blocks_with_limit(&self, request_limit: Option<u64>) -> Result<bool> {
+        info!("updating log blocks (lim {:?})", request_limit);
+
         use protocol::{SignedMessage};
         use logging::{ReadTeamLogBlocksResponse, LogFilter, ReadLogBlocksRequest};
 

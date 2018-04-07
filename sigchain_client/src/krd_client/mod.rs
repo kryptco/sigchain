@@ -113,6 +113,12 @@ fn daemon_control_request<R: serde::de::DeserializeOwned>(request: hyper::Reques
     Ok(core.run(work)?)
 }
 
+pub fn daemon_me_request_force_refresh() -> Result<enclave_protocol::Profile> {
+    let request = hyper::Request::new(hyper::Method::Get, Uri::new(daemon_control_path()?, "/pair").into());
+    debug!("Sending force refresh to krd");
+    daemon_control_request::<enclave_protocol::Profile>(request)
+}
+
 pub fn daemon_enclave_control_request(enclave_request: &enclave_protocol::Request,
                                       should_read_notify_logs: bool) -> Result<enclave_protocol::Response> {
 
@@ -127,7 +133,10 @@ pub fn daemon_enclave_control_request(enclave_request: &enclave_protocol::Reques
     eprintln!("{}", format!("Krypton ▶ Requesting team operation from phone").cyan());
 
     let mut request = hyper::Request::new(hyper::Method::Put, Uri::new(daemon_control_path()?, "/enclave").into());
-    request.set_body(serde_json::to_vec(&enclave_request)?);
+    let json_body = serde_json::to_string(&enclave_request)?;
+    debug!("Sending enclave request: {}", json_body);
+    request.set_body(json_body);
+
 
     let response_result = daemon_control_request::<enclave_protocol::Response>(request);
     // print the response result
@@ -143,19 +152,15 @@ pub fn daemon_enclave_control_request(enclave_request: &enclave_protocol::Reques
     response_result
 }
 
-pub fn daemon_me_request_force_refresh() -> Result<enclave_protocol::Profile> {
-    let request = hyper::Request::new(hyper::Method::Get, Uri::new(daemon_control_path()?, "/pair").into());
-
-    daemon_control_request::<enclave_protocol::Profile>(request)
-}
-
 pub fn daemon_me_request() -> Result<enclave_protocol::Profile> {
     use enclave_protocol::*;
 
     let me_request = enclave_protocol::Request::new(RequestBody::MeRequest(MeRequest{ pgp_user_id: None }))?;
 
     let mut request = hyper::Request::new(hyper::Method::Get, Uri::new(daemon_control_path()?, "/enclave").into());
-    request.set_body(serde_json::to_vec(&me_request)?);
+    let json_body = serde_json::to_string(&me_request)?;
+    debug!("Sending me request to krd: {}", json_body);
+    request.set_body(json_body);
 
     let response_result = daemon_control_request::<enclave_protocol::Response>(request)?;
 
