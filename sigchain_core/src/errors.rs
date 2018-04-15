@@ -1,6 +1,9 @@
 use super::*;
 
 error_chain!{
+    errors {
+        TryFromIntError {}
+    }
     foreign_links {
         SerdeJson(serde_json::Error);
         Base64Decode(base64::DecodeError);

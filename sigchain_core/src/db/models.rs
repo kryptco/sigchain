@@ -17,7 +17,7 @@ pub struct Block {
     pub member_public_key: Vec<u8>,
     pub operation: String, //  serialized Payload i.e. { write_block: ... }
     pub signature: Vec<u8>,
-    created_at: chrono::NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Block {
@@ -73,9 +73,9 @@ impl Block {
     pub fn insert(&self, conn: &DBConnection) -> QueryResult<usize> {
         insert_into(Self::table()).values(self).execute(conn)
     }
-    pub fn count(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count(conn: &TeamDBConnection) -> Result<u64> {
         use self::blocks::dsl;
-        Self::table().filter(dsl::team_public_key.eq(conn.team)).count().get_result(conn.conn)
+        Self::table().filter(dsl::team_public_key.eq(conn.team)).count().get_result::<i64>(conn.conn)?.to_u64()
     }
 }
 
@@ -164,14 +164,14 @@ impl LogBlock {
     pub fn insert(&self, conn: &DBConnection) -> QueryResult<usize> {
         insert_into(Self::table()).values(self).execute(conn)
     }
-    pub fn count_last_30_days(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count_last_30_days(conn: &TeamDBConnection) -> Result<u64> {
         use self::log_blocks::dsl;
         use chrono;
         use std::ops::Sub;
         Self::table()
             .filter(dsl::team_public_key.eq(conn.team))
             .filter(dsl::created_at.gt(chrono::Utc::now().naive_utc().sub(chrono::Duration::days(30))))
-            .count().get_result(conn.conn)
+            .count().get_result::<i64>(conn.conn)?.to_u64()
     }
 }
 
@@ -192,12 +192,12 @@ impl TeamMembership {
             .filter(dsl::team_public_key.eq(conn.team))
             .get_results(conn.conn)
     }
-    pub fn count(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count(conn: &TeamDBConnection) -> Result<u64> {
         use self::team_memberships::dsl;
         Self::table()
             .filter(dsl::team_public_key.eq(conn.team))
             .count()
-            .get_result(conn.conn)
+            .get_result::<i64>(conn.conn)?.to_u64()
     }
     pub fn find(conn: &TeamDBConnection, identity_public_key: &[u8]) -> QueryResult<Self> {
         Self::table().find((conn.team, identity_public_key)).first::<Self>(conn.conn)
@@ -221,6 +221,18 @@ impl TeamMembership {
                     .collect()
             })
     }
+
+    pub fn filter_admin_emails(conn: &TeamDBConnection) -> QueryResult<Vec<String>> {
+        use self::team_memberships::dsl;
+        Self::table().filter(dsl::team_public_key.eq(conn.team))
+            .filter(dsl::is_admin.eq(true))
+            .get_results::<Self>(conn.conn)
+            .map(|admin_memberships| {
+                admin_memberships.into_iter().map(|m| m.email)
+                    .collect()
+            })
+    }
+
     pub fn find_email(conn: &TeamDBConnection, email: &str) -> QueryResult<Self> {
         use self::team_memberships::dsl;
         Self::table().filter(dsl::team_public_key.eq(conn.team))
@@ -234,6 +246,7 @@ impl TeamMembership {
             .filter(dsl::is_admin.eq(true))
             .first(conn.conn)
     }
+
 }
 
 #[derive(Queryable, Insertable, Identifiable, Debug, Clone, PartialEq, Eq)]
@@ -261,10 +274,10 @@ impl IndirectInvitation {
     pub fn insert(&self, conn: &TeamDBConnection) -> QueryResult<usize> {
         insert_into(Self::table()).values(self).execute(conn.conn)
     }
-    pub fn count(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count(conn: &TeamDBConnection) -> Result<u64> {
         Self::table().filter(indirect_invitations::team_public_key.eq(conn.team))
             .count()
-            .get_result(conn.conn)
+            .get_result::<i64>(conn.conn)?.to_u64()
     }
     pub fn delete_team_invites(conn: &TeamDBConnection) -> QueryResult<()> {
         use self::indirect_invitations::dsl;
@@ -312,10 +325,10 @@ impl DirectInvitation {
     pub fn insert(&self, conn: &TeamDBConnection) -> QueryResult<usize> {
         insert_into(Self::table()).values(self).execute(conn.conn)
     }
-    pub fn count(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count(conn: &TeamDBConnection) -> Result<u64> {
         Self::table().filter(direct_invitations::team_public_key.eq(conn.team))
             .count()
-            .get_result(conn.conn)
+            .get_result::<i64>(conn.conn)?.to_u64()
     }
     pub fn delete(&self, conn: &TeamDBConnection) -> QueryResult<usize> {
         delete(self).execute(conn.conn)
@@ -434,6 +447,11 @@ impl Team {
     pub fn find(conn: &TeamDBConnection) -> QueryResult<Self> {
         Self::table().find(conn.team).first::<Self>(conn.conn)
     }
+    pub fn created_at(conn: &TeamDBConnection) -> QueryResult<chrono::NaiveDateTime> {
+        Ok(Block::table().filter(blocks::team_public_key.eq(conn.team))
+            .filter(blocks::last_block_hash.is_null())
+            .first::<Block>(conn.conn)?.created_at.clone())
+    }
     pub fn insert(&self, conn: &DBConnection) -> QueryResult<usize> {
         insert_into(Self::table()).values(self).execute(conn)
     }
@@ -486,12 +504,13 @@ impl PinnedHostKey {
         use self::pinned_host_keys::dsl;
         Self::table().filter(dsl::team_public_key.eq(team_public_key)).get_results(conn)
     }
-    pub fn count(conn: &TeamDBConnection) -> QueryResult<i64> {
+    pub fn count(conn: &TeamDBConnection) -> Result<u64> {
         use self::pinned_host_keys::dsl;
         Self::table()
             .filter(dsl::team_public_key.eq(conn.team))
             .count()
-            .get_result(conn.conn)
+            .get_result::<i64>(conn.conn)?
+            .to_u64()
     }
 }
 

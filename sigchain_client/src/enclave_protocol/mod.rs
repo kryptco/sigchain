@@ -262,6 +262,16 @@ impl ServerEndpoints {
             billing_host: "www-staging.krypt.co".into(),
         }
     }
+    pub fn from_stack(stack: &str) -> super::Result<ServerEndpoints> {
+        let endpoints = match stack {
+            "teamsdev" => ServerEndpoints::dev(),
+            "teamsstaging" => ServerEndpoints::staging(),
+            "teamsprod" => ServerEndpoints::prod(),
+            _ => bail!("unknown stack for server endpoint"),
+        };
+
+        Ok(endpoints)
+    }
     pub fn url(&self, endpoint: &protocol::Endpoint)  -> String {
         use Endpoint::*;
         let path = match endpoint {

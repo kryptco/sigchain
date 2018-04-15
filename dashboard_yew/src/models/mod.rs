@@ -142,13 +142,14 @@ impl Model {
             billing_data: BillingData {
                 billing_info: BillingInfo {
                     current_tier: PaymentTier {
-                    name: "Starter".into(),
+                        name: "Starter".into(),
                         price: 0,
-                        limit: BillingUsage {
-                            members: 10,
-                            hosts: 5,
-                            logs_last_30_days: 1000,
-                        }
+                        limit: Some(BillingLimit {
+                            members: Some(3),
+                            hosts: Some(5),
+                            logs_last_30_days: Some(1000),
+                        }),
+                        unit_description: "per user".into(),
                     },
                     usage: BillingUsage {
                             members: 0,

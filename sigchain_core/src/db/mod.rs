@@ -3,7 +3,7 @@ use team::{MainChain};
 use protocol::SignedMessage;
 use logging;
 
-use ::errors::{Result, Error};
+use ::errors::{Result, Error, self};
 pub use diesel::connection::Connection;
 
 
@@ -20,6 +20,21 @@ pub fn uniqueness_to<E: Into<Error>>(e: E, r: ::errors::specified::ErrorKind) ->
     match &e {
         &::errors::Error(Diesel(DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, _)), _) => r.into(),
         _ => e,
+    }
+}
+
+// Awaiting TryFrom stabilization of primitive ints
+pub trait ToU64 {
+    fn to_u64(self) -> Result<u64>;
+}
+
+impl ToU64 for i64 {
+    fn to_u64(self) -> Result<u64> {
+        if self >= 0 {
+            Ok(self as u64)
+        } else {
+            bail!(errors::ErrorKind::TryFromIntError)
+        }
     }
 }
 

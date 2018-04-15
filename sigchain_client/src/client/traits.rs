@@ -122,7 +122,7 @@ pub trait DBConnect: Identify {
         let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
         Ok(db::Identity::find(conn, identity_public_key)?.encryption_public_key)
     }
-    fn main_chain_block_count(&self) -> Result<i64> {
+    fn main_chain_block_count(&self) -> Result<u64> {
         let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
         Ok(db::Block::count(conn)?)
     }

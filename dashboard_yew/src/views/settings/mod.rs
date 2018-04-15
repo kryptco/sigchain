@@ -130,13 +130,27 @@ impl Model {
         let billing_url = self.billing_data.url.clone();
         let tier_name = self.billing_data.billing_info.current_tier.name.clone();
 
+        // set the usage labels
         let usage_members = self.billing_data.billing_info.usage.members;
         let usage_hosts = self.billing_data.billing_info.usage.hosts;
         let usage_logs = self.billing_data.billing_info.usage.logs_last_30_days;
 
-        let tier_members = self.billing_data.billing_info.current_tier.limit.members;
-        let tier_hosts = self.billing_data.billing_info.current_tier.limit.hosts;
-        let tier_logs = self.billing_data.billing_info.current_tier.limit.logs_last_30_days;
+        // set the limit label
+        let limit_label  = |opt_value:&Option<Option<u64>>| {
+            if let Some(value) = opt_value.unwrap_or(None) {
+                if value > 1000 {
+                    return format!("{}k", value);
+                }
+
+                return format!("{}", value);
+            }
+            "∞".into()
+        };
+
+        let limit = self.billing_data.billing_info.current_tier.limit.clone();
+        let tier_members = limit_label(&limit.clone().map(|l| l.members));
+        let tier_hosts = limit_label(&limit.clone().map(|l| l.hosts));
+        let tier_logs = limit_label(&limit.clone().map(|l| l.logs_last_30_days));
 
         // check if tier paid
         let tier_class = match self.billing_data.is_paid() {
@@ -150,15 +164,15 @@ impl Model {
         };
 
         // emphasize usage that's close to the limit
-        let members_emph_class = match usage_members > tier_members/2 {
+        let members_emph_class = match self.billing_data.members_close_to_limit() {
             true => "tier-close",
             false => ""
         };
-        let hosts_emph_class = match usage_hosts > tier_hosts/2 {
+        let hosts_emph_class = match self.billing_data.hosts_close_to_limit() {
             true => "tier-close",
             false => ""
         };
-        let logs_emph_class = match usage_logs > tier_logs/2 {
+        let logs_emph_class = match self.billing_data.logs_close_to_limit() {
             true => "tier-close",
             false => ""
         };
@@ -183,7 +197,7 @@ impl Model {
                             </div>
                             <div class="tier-usage",>
                                 <div class="tier-usage-title",>{"Monthly Audit Logs"}</div>
-                                <div class="tier-usage-value",><span class=("usage", logs_emph_class),>{ usage_logs }</span><span class="divisor",>{"/"}</span><span class="limit",>{ tier_logs/1000 }{"k"}</span></div>
+                                <div class="tier-usage-value",><span class=("usage", logs_emph_class),>{ usage_logs }</span><span class="divisor",>{"/"}</span><span class="limit",>{ tier_logs }</span></div>
                             </div>
                         </div>
                     </div>

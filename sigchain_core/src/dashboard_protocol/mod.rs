@@ -86,6 +86,33 @@ pub struct BillingData {
 }
 
 impl BillingData {
+
+    pub fn members_close_to_limit(&self) -> bool {
+        BillingData::is_close(self.billing_info.usage.members,
+                              self.billing_info.current_tier.limit.clone().map(|l| l.members).unwrap_or(None))
+    }
+
+    pub fn hosts_close_to_limit(&self) -> bool {
+        BillingData::is_close(self.billing_info.usage.hosts,
+                              self.billing_info.current_tier.limit.clone().map(|l| l.hosts).unwrap_or(None))
+    }
+
+    pub fn logs_close_to_limit(&self) -> bool {
+        BillingData::is_close(self.billing_info.usage.logs_last_30_days,
+                              self.billing_info.current_tier.limit.clone().map(|l| l.logs_last_30_days).unwrap_or(None))
+    }
+
+    fn is_close(usage:u64, limit: Option<u64>) -> bool {
+        let limit = match limit {
+            Some(l) => l,
+            None => return false,
+        };
+
+        usage > limit/2
+    }
+}
+
+impl BillingData {
     pub fn is_paid(&self) -> bool {
         self.billing_info.current_tier.price > 0
     }

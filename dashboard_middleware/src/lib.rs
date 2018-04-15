@@ -504,14 +504,11 @@ fn team_handler(client: &DelegatedNetworkClient) -> Result<Vec<u8>> {
             current_tier: PaymentTier {
                 name: "--".into(),
                 price: 0,
-                limit: BillingUsage {
-                    members: 0,
-                    hosts: 0,
-                    logs_last_30_days: 1,
-                }
+                limit: None,
+                unit_description: "--".into(),
             },
             usage: BillingUsage {
-                members: member_rows.len().clone() as i64,
+                members: member_rows.len().clone() as u64,
                 hosts: 0,
                 logs_last_30_days: 0,
             }
