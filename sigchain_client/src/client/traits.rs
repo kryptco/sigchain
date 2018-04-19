@@ -62,6 +62,14 @@ pub trait DBConnect: Identify {
         }
     }
 
+    fn get_active_and_removed_by_email(&self, email: &str) -> Result<Vec<team::Identity>> {
+        let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
+        Ok(
+            db::Identity::filter_by_email(conn, email)?.into_iter()
+                .map(db::Identity::into_identity).collect::<Vec<_>>()
+        )
+    }
+
     fn get_active_members(&self) -> Result<Vec<team::Identity>> {
         let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
         let results = db::Identity::find_all_for_team(conn)?;

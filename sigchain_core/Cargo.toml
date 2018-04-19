@@ -16,9 +16,9 @@ scopeguard = "0.3.2"
 serde = "1.0.9"
 serde_derive = "1.0.9"
 serde_json = "1.0.2"
+sha1 = "0.5.0"
 time = "0.1.39"
 url = "1.6.0"
-sha1 = "0.5.0"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -42,9 +42,9 @@ git = "https://github.com/dnaq/sodiumoxide"
 optional = true
 
 [dependencies.libsqlite3-sys]
-version = "0.9.1"
-optional = true
 features = ["bundled"]
+optional = true
+version = "0.9.1"
 
 [dependencies.reqwest]
 optional = true
@@ -62,13 +62,19 @@ optional = true
 git = "https://github.com/kryptco/ssh-wire"
 optional = true
 
-[target."cfg(target_os=\"android\")".dependencies.jni]
-default-features = false
-git = "https://github.com/prevoty/jni-rs"
-
 [features]
 crypto = ["libsodium-sys", "sodiumoxide"]
 db = ["diesel", "diesel_migrations"]
 krd_client = []
 pg = ["db", "diesel/postgres"]
 sqlite = ["db", "diesel/sqlite", "libsqlite3-sys"]
+
+[target]
+
+[target."cfg(target_os=\"android\")"]
+
+[target."cfg(target_os=\"android\")".dependencies]
+
+[target."cfg(target_os=\"android\")".dependencies.jni]
+default-features = false
+git = "https://github.com/prevoty/jni-rs"

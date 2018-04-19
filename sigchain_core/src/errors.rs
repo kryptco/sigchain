@@ -19,6 +19,7 @@ error_chain!{
         Hyper(hyper::Error) #[cfg(feature = "hyper")];
         HTTP(reqwest::Error) #[cfg(feature = "reqwest")];
         Jni(jni::errors::Error) #[cfg(target_os = "android")];
+        ParseInt(std::num::ParseIntError);
     }
     links {
         Specified(specified::Error, specified::ErrorKind);

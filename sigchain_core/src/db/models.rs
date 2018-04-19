@@ -407,11 +407,11 @@ impl Identity {
         Self::table().filter(dsl::team_public_key.eq(conn.team))
                      .get_results(conn.conn)
     }
-    pub fn filter_by_email(conn: &DBConnection, team_public_key: &[u8], email: &str) -> QueryResult<Vec<Self>> {
+    pub fn filter_by_email(conn: &TeamDBConnection, email: &str) -> QueryResult<Vec<Self>> {
         use self::identities::dsl;
-        Self::table().filter(dsl::team_public_key.eq(team_public_key))
+        Self::table().filter(dsl::team_public_key.eq(conn.team))
             .filter(dsl::email.eq(email))
-            .get_results(conn)
+            .get_results(conn.conn)
     }
     pub fn filter_by_encryption_public_key(conn: &TeamDBConnection, encryption_public_key: &[u8]) -> QueryResult<Vec<Self>> {
         use self::identities::dsl;

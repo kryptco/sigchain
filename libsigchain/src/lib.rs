@@ -11,6 +11,8 @@ extern crate url;
 
 extern crate colored;
 
+extern crate itertools;
+
 #[allow(unused_imports)]
 pub use c_api::*;
 pub mod c_api {
@@ -24,7 +26,6 @@ pub mod c_api {
 
     use serde_json;
     use open;
-    use std;
 
     #[allow(unused_imports)]
     use colored::Colorize;
@@ -512,74 +513,39 @@ pub mod c_api {
         eprintln!();
     }
 
-    #[cfg(target_os = "linux")]
-    extern crate openssl_probe;
+    use ::std::os::raw::c_char;
+    use ::std::process::exit;
+    use sigchain_client;
+    // Pass arguments from Go since the rust native library std::env::args returns an empty list on Linux
+    #[no_mangle]
+    pub extern "C" fn kr_add(args: *const *const c_char, num_args: usize) {
+        let args = parse_arg_array_or_fatal(args, num_args);
+        let _ = sigchain_client::ssh::add_cli_command(args.as_slice()).map_err(|e| eprintln!("Error adding keys: {}", e));
+    }
+    #[no_mangle]
+    pub extern "C" fn kr_list(args: *const *const c_char, num_args: usize) {
+        let args = parse_arg_array_or_fatal(args, num_args);
+        let _ = sigchain_client::ssh::list_cli_command(args.as_slice()).map_err(|e| eprintln!("Error listing keys: {}", e));
+    }
+    #[no_mangle]
+    pub extern "C" fn kr_rm(args: *const *const c_char, num_args: usize) {
+        let args = parse_arg_array_or_fatal(args, num_args);
+        let _ = sigchain_client::ssh::rm_cli_command(args.as_slice()).map_err(|e| eprintln!("Error removing keys: {}", e));
+    }
 
-    fn do_with_delegated_network_cli<F: Fn(&DelegatedNetworkClient) -> Result<()>>(f: F) {
-        let _ = env_logger::init();
-        #[cfg(target_os="linux")]
-        {
-            openssl_probe::init_ssl_cert_env_vars();
+    fn parse_arg_array_or_fatal<'a>(args: *const *const c_char, num_args: usize) -> Vec<&'a str> {
+        use std::slice;
+        use std::ffi::CStr;
+        use itertools::process_results;
+
+        let args_slice = unsafe{ slice::from_raw_parts(args, num_args) };
+        let parsed_args = unsafe{ args_slice.into_iter().map(|ptr| CStr::from_ptr(*ptr)).map(CStr::to_str) };
+
+        if let Ok(args) = process_results(parsed_args, |iter| iter.collect::<Vec<_>>()) {
+            return args
+        } else {
+            eprintln!("Error parsing arguments");
+            exit(1)
         }
-        use sigchain_core::diesel::result::Error::{DatabaseError};
-        use sigchain_core::diesel_migrations::RunMigrationsError::QueryError;
-        use sigchain_core::errors::ErrorKind::*;
-        use std::thread;
-        use std::time::Duration;
-
-        let do_f = || -> Result<()> {
-            let mut client = DelegatedNetworkClient::for_current_team()?;
-            client.should_read_notify_logs = true;
-
-            // make sure we're up to date
-            client.update_team_blocks()?;
-
-            f(&client)
-        };
-
-        let mut try_number = 1;
-        let max_retry_count = 5;
-        let mut unspecified_error_retry = true;
-
-        while let Some(error) = do_f().err() {
-            match error {
-                Error(Diesel(DatabaseError(_, ref err_info)), _) if err_info.message() == "database is locked" => {
-                    eprintln!("got database locked error, trying again");
-
-                    if try_number > max_retry_count {
-                        eprintln!("keeps failing after {} attempts", try_number);
-                        break;
-                    }
-
-                    try_number += 1;
-                    thread::sleep(Duration::from_secs(2));
-                    continue;
-                },
-                Error(DieselMigration(QueryError(DatabaseError(_, ref err_info))), _) if err_info.message() == "database is locked" => {
-                    eprintln!("Fatal error, run: kr restart");
-                    break
-                },
-                // If rejected error, don't print it as it's handled by the krd_client.
-                Error(Msg(ref msg), _) if msg == "rejected" => {
-                    break;
-                }
-                // If unspecified error, refresh team checkpoint and try again.
-                Error(Msg(ref msg), _) if msg == "unspecified error" => {
-                    if !unspecified_error_retry {
-                        eprintln!("{}", "Krypton ▶ Request failed: unspecified error".red());
-                        break;
-                    }
-
-                    let _ = krd_client::daemon_me_request_force_refresh();
-                    unspecified_error_retry = false;
-                    continue;
-                }
-                e => {
-                    eprintln!("{}", format!("Krypton ▶ Request failed: {}", e).red());
-                    break
-                }
-            };
-        }
-        let _ = std::io::stderr().flush();
     }
 }

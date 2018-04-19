@@ -1,4 +1,9 @@
 extern crate reqwest;
+extern crate env_logger;
+
+#[cfg(target_os = "linux")]
+extern crate openssl_probe;
+
 use super::*;
 use enclave_protocol::*;
 use team::SignedReadToken;
@@ -419,4 +424,82 @@ impl DelegatedNetworkClient {
 
         Ok(team_operation_response)
     }
+}
+
+pub fn try_with_delegated_network_cli<R, F: Fn(&DelegatedNetworkClient) -> Result<R>>(update_team_blocks: bool, f: F) -> Result<R>{
+    use std::io::prelude::*;
+    use colored::Colorize;
+    let _ = env_logger::try_init();
+    #[cfg(target_os="linux")]
+    {
+        openssl_probe::init_ssl_cert_env_vars();
+    }
+    use sigchain_core::diesel::result::Error::{DatabaseError};
+    use sigchain_core::diesel_migrations::RunMigrationsError::QueryError;
+    use sigchain_core::errors::ErrorKind::*;
+    use std::thread;
+    use std::time::Duration;
+
+    let do_f = || -> Result<R> {
+        let mut client = DelegatedNetworkClient::for_current_team()?;
+        client.should_read_notify_logs = true;
+
+        if update_team_blocks {
+            client.update_team_blocks()?;
+        }
+
+        f(&client)
+    };
+
+    let mut try_number = 1;
+    let max_retry_count = 5;
+    let mut unspecified_error_retry = true;
+
+    loop {
+        match do_f() {
+            Ok(result) => {
+                return Ok(result)
+            },
+            Err(error) => {
+                match &error {
+                    &Error(Diesel(DatabaseError(_, ref err_info)), _) if err_info.message() == "database is locked" => {
+                        if try_number > max_retry_count {
+                            eprintln!("keeps failing after {} attempts", try_number);
+                        } else {
+                            eprintln!("got database locked error, trying again");
+
+                            try_number += 1;
+                            thread::sleep(Duration::from_secs(2));
+                            continue;
+                        }
+                    },
+                    &Error(DieselMigration(QueryError(DatabaseError(_, ref err_info))), _) if err_info.message() == "database is locked" => {
+                        eprintln!("Fatal error, run: kr restart");
+                    },
+                    // If rejected error, don't print it as it's handled by the krd_client.
+                    &Error(Msg(ref msg), _) if msg == "rejected" => {
+                    }
+                    // If unspecified error, refresh team checkpoint and try again.
+                    &Error(Msg(ref msg), _) if msg == "unspecified error" => {
+                        if !unspecified_error_retry {
+                            eprintln!("{}", "Krypton ▶ Request failed: unspecified error".red());
+                        } else {
+                            let _ = krd_client::daemon_me_request_force_refresh();
+                            unspecified_error_retry = false;
+                            continue;
+                        }
+                    }
+                    e => {
+                        eprintln!("{}", format!("Krypton ▶ Request failed: {}", e).red());
+                    }
+                };
+                let _ = std::io::stderr().flush();
+                return Err(error);
+            }
+        }
+    }
+}
+
+pub fn do_with_delegated_network_cli<F: Fn(&DelegatedNetworkClient) -> Result<()>>(f: F) {
+    let _ = try_with_delegated_network_cli(true, f);
 }

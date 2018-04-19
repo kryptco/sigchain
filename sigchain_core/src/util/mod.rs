@@ -3,6 +3,8 @@ use super::*;
 mod cli;
 pub use self::cli::*;
 
+pub mod text;
+
 #[macro_use]
 pub mod timing;
 pub use self::timing::*;

@@ -3,10 +3,6 @@ authors = ["Kevin King <kevin@krypt.co>"]
 name = "sigchain_client"
 version = "0.1.0"
 
-[lib]
-crate-type = ["cdylib", "rlib", "staticlib"]
-name = "sigchain_client"
-
 [[bin]]
 name = "block_validator"
 required-features = ["network_client"]
@@ -15,11 +11,11 @@ required-features = ["network_client"]
 backoff = "0.1.2"
 base64 = "0.6.0"
 byteorder = "1.1.0"
-clap = "2.26.0"
+clap = "2.29.2"
 colored = "1.5.2"
 crc24 = "0.1.6"
 dotenv = "0.9.0"
-env_logger = "0.4.3"
+env_logger = "0.5.2"
 error-chain = "^0.11.0"
 futures = "0.1.14"
 hyper = "0.11.1"
@@ -38,9 +34,6 @@ url = "1.6.0"
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4.0"
-
-[dependencies.sigchain_core]
-path = "../sigchain_core"
 
 [dependencies.diesel]
 optional = true
@@ -61,6 +54,9 @@ version = "0.7.2"
 features = ["serde"]
 version = "0.9.0"
 
+[dependencies.sigchain_core]
+path = "../sigchain_core"
+
 [dependencies.sodiumoxide]
 git = "https://github.com/dnaq/sodiumoxide"
 
@@ -70,9 +66,13 @@ version = "0.6.0"
 
 [features]
 android_client = ["reqwest", "sigchain_core/reqwest", "sigchain_core/sqlite", "sigchain_core/crypto", "sigchain_core/ssh-wire"]
-network_client = ["reqwest", "sigchain_core/reqwest", "hyperlocal", "users", "sigchain_core/sqlite", "sigchain_core/krd_client", "sigchain_core/ssh-wire", "sigchain_core/crypto", "sigchain_core/hyper"]
 default = ["network_client"]
 lambda = ["sigchain_core/pg", "sigchain_core/crypto", "sigchain_core/ssh-wire"]
+network_client = ["reqwest", "sigchain_core/reqwest", "hyperlocal", "users", "sigchain_core/sqlite", "sigchain_core/krd_client", "sigchain_core/ssh-wire", "sigchain_core/crypto", "sigchain_core/hyper"]
+
+[lib]
+crate-type = ["cdylib", "rlib", "staticlib"]
+name = "sigchain_client"
 
 [replace]
 
@@ -85,3 +85,12 @@ git = "https://github.com/kryptco/pq-sys"
 
 [replace."ring:0.12.1"]
 git = "https://github.com/kryptco/ring"
+
+[target]
+
+[target."cfg(target_os=\"linux\")"]
+
+[target."cfg(target_os=\"linux\")".dependencies]
+
+[target."cfg(target_os=\"linux\")".dependencies.openssl-probe]
+version = "0.1.2"
