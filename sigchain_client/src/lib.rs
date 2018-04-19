@@ -31,6 +31,8 @@ extern crate reqwest;
 
 extern crate url;
 
+extern crate clap;
+
 #[macro_export]
 macro_rules! success(
     ($arg:expr) => { {

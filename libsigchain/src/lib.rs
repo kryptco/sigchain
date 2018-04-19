@@ -582,4 +582,10 @@ pub mod c_api {
         }
         let _ = std::io::stderr().flush();
     }
+
+    #[no_mangle]
+    pub extern "C" fn kr_add() {
+        use sigchain_client;
+        let _ = sigchain_client::ssh::add_cli_command().map_err(|e| eprintln!("Error adding keys: {:?}", e));
+    }
 }
