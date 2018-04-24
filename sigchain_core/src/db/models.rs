@@ -246,6 +246,13 @@ impl TeamMembership {
             .filter(dsl::is_admin.eq(true))
             .first(conn.conn)
     }
+    pub fn find_admin_by_email(conn: &TeamDBConnection, email: &str) -> QueryResult<Self> {
+        use self::team_memberships::dsl;
+        Self::table().filter(dsl::team_public_key.eq(conn.team))
+            .filter(dsl::email.eq(email))
+            .filter(dsl::is_admin.eq(true))
+            .first(conn.conn)
+    }
 
 }
 

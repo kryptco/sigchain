@@ -43,6 +43,11 @@ pub trait DBConnect: Identify {
                 .map(db::Identity::into_identity).collect()
         )
     }
+    fn get_admin_by_email(&self, email: &str) -> Result<team::Identity> {
+        let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
+        let admin_pk = db::TeamMembership::find_admin_by_email(conn, email)?.member_public_key;
+        Ok(db::Identity::find(conn, &admin_pk).map(db::Identity::into_identity)?)
+    }
     fn get_active_and_removed_members(&self) -> Result<Vec<team::Identity>> {
         let conn = &db::TeamDBConnection{conn: self.db_conn(), team: self.team_pk()};
         let results = db::Identity::find_all_for_team(conn)?;

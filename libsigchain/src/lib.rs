@@ -109,17 +109,6 @@ pub mod c_api {
     }
 
     #[no_mangle]
-    pub extern "C" fn get_admins() {
-        do_with_delegated_network_cli(|client| -> Result<()> {
-            for (idx, admin) in client.get_admins()?.iter().enumerate() {
-                eprint!("{}", format!("{}. ", idx + 1).green());
-                println!("{}", admin.email);
-            }
-            Ok(())
-        });
-    }
-
-    #[no_mangle]
     pub extern "C" fn get_policy() {
         do_with_delegated_network_cli(|client| -> Result<()> {
             match client.get_policy()?.temporary_approval_seconds {
@@ -184,7 +173,7 @@ pub mod c_api {
 
     #[no_mangle]
     pub extern "C" fn get_members(email_ptr: *const u8, email_len: usize,
-                                  print_ssh_pubkey: bool, print_pgp_pubkey: bool) {
+                                  print_ssh_pubkey: bool, print_pgp_pubkey: bool, admin: bool) {
         do_with_delegated_network_cli(|client| -> Result<()> {
             let email: Option<&str> = match email_ptr.is_null() {
                 true => None,
@@ -194,13 +183,27 @@ pub mod c_api {
             };
 
             let members = match email {
-                Some(e) => vec![client.get_active_member_by_email(e)?],
-                None => client.get_active_members()?,
+                Some(e) => {
+                    if admin {
+                        vec![client.get_admin_by_email(e)?]
+                    } else {
+                        vec![client.get_active_member_by_email(e)?]
+                    }
+                },
+                None => {
+                    if admin {
+                        client.get_admins()?
+                    } else {
+                        client.get_active_members()?
+                    }
+                },
             };
 
+            let title = if admin { "admin" } else { "member" }.to_string();
+
             match email {
-                Some(e) => eprintln!("Found team member with email {}", format!("{}", e).yellow()),
-                None => eprintln!("Team has {}", format!("{} members", members.len()).green()),
+                Some(e) => eprintln!("Found team {title} with email {}", format!("{}", e).yellow(), title = title),
+                None => eprintln!("Team has {}", format!("{} {title}s", members.len(), title = title).green()),
             }
 
             if print_ssh_pubkey && print_pgp_pubkey {
