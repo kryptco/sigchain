@@ -50,20 +50,33 @@ impl NetworkClient {
     }
 }
 
+fn string_not_empty(s: String) -> Result<String> {
+    if s == "" {
+        Err("empty env var".into())
+    } else {
+        Ok(s)
+    }
+}
+
+fn nonempty_env(k: &str) -> Result<String> {
+    Ok(env::var(k).map_err(Error::from).and_then(string_not_empty)?)
+}
+
 fn new_proxy_aware_http_client() -> Result<reqwest::Client> {
     let mut builder = reqwest::Client::builder()?;
 
-    let https_proxy = env::var("HTTPS_PROXY")
-        .or_else(|_| env::var("https_proxy"))
-        .or_else(|_| env::var("HTTP_PROXY"))
-        .or_else(|_| env::var("http_proxy"))
+    let https_proxy = nonempty_env("HTTPS_PROXY")
+        .or_else(|_| nonempty_env("https_proxy"))
+        .or_else(|_| nonempty_env("HTTP_PROXY"))
+        .or_else(|_| nonempty_env("http_proxy"))
         .ok();
     if let Some(https_proxy) = https_proxy {
         builder.proxy(reqwest::Proxy::https(https_proxy.as_str())?);
     }
 
-    let http_proxy = env::var("HTTP_PROXY")
-        .or_else(|_| env::var("http_proxy")).ok();
+    let http_proxy = nonempty_env("HTTP_PROXY")
+        .or_else(|_| nonempty_env("http_proxy"))
+        .ok();
     if let Some(http_proxy) = http_proxy {
         builder.proxy(reqwest::Proxy::http(http_proxy.as_str())?);
     }
