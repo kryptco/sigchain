@@ -50,13 +50,35 @@ impl NetworkClient {
     }
 }
 
+fn new_proxy_aware_http_client() -> Result<reqwest::Client> {
+    let mut builder = reqwest::Client::builder()?;
+
+    let https_proxy = env::var("HTTPS_PROXY")
+        .or_else(|_| env::var("https_proxy"))
+        .or_else(|_| env::var("HTTP_PROXY"))
+        .or_else(|_| env::var("http_proxy"))
+        .ok();
+    if let Some(https_proxy) = https_proxy {
+        builder.proxy(reqwest::Proxy::https(https_proxy.as_str())?);
+    }
+
+    let http_proxy = env::var("HTTP_PROXY")
+        .or_else(|_| env::var("http_proxy")).ok();
+    if let Some(http_proxy) = http_proxy {
+        builder.proxy(reqwest::Proxy::http(http_proxy.as_str())?);
+    }
+
+    Ok(builder.build()?)
+}
+
 use ServerEndpoints;
 pub fn default_broadcast<T>(server_endpoints: &ServerEndpoints, endpoint: &Endpoint, request: &SignedMessage) -> super::Result<T>
 where T: serde::de::DeserializeOwned {
     use std::io::Read;
     let request_body = serde_json::to_vec(request)?;
     time_fn!("request");
-    let client = reqwest::Client::new()?;
+    let client = new_proxy_aware_http_client()?;
+
     let mut response_bytes = client.put(
         &server_endpoints.url(endpoint),
     )?.body(request_body).send()?;
