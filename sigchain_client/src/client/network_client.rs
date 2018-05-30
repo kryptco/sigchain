@@ -58,28 +58,49 @@ fn string_not_empty(s: String) -> Result<String> {
     }
 }
 
+fn string_to_url_default_http(s: String) -> Result<reqwest::Url> {
+    Ok(reqwest::Url::parse(&s).or(reqwest::Url::parse(&("http://".to_string() + &s)))?)
+}
+
 fn nonempty_env(k: &str) -> Result<String> {
     Ok(env::var(k).map_err(Error::from).and_then(string_not_empty)?)
+}
+
+fn env_to_proxy_url(k: &str) -> Result<reqwest::Url> {
+    nonempty_env(k).and_then(string_to_url_default_http)
 }
 
 fn new_proxy_aware_http_client() -> Result<reqwest::Client> {
     let mut builder = reqwest::Client::builder()?;
 
-    let https_proxy = nonempty_env("HTTPS_PROXY")
-        .or_else(|_| nonempty_env("https_proxy"))
-        .or_else(|_| nonempty_env("HTTP_PROXY"))
-        .or_else(|_| nonempty_env("http_proxy"))
+    let https_proxy = env_to_proxy_url("HTTPS_PROXY")
+        .or_else(|_| env_to_proxy_url("https_proxy"))
+        .or_else(|_| env_to_proxy_url("HTTP_PROXY"))
+        .or_else(|_| env_to_proxy_url("http_proxy"))
         .ok();
-    if let Some(https_proxy) = https_proxy {
-        builder.proxy(reqwest::Proxy::https(https_proxy.as_str())?);
-    }
 
-    let http_proxy = nonempty_env("HTTP_PROXY")
-        .or_else(|_| nonempty_env("http_proxy"))
+    let http_proxy = env_to_proxy_url("HTTP_PROXY")
+        .or_else(|_| env_to_proxy_url("http_proxy"))
         .ok();
-    if let Some(http_proxy) = http_proxy {
-        builder.proxy(reqwest::Proxy::http(http_proxy.as_str())?);
-    }
+
+    let no_proxy = nonempty_env("no_proxy").ok();
+
+    builder.proxy(reqwest::Proxy::custom(move |url| {
+        match (no_proxy.clone(), url.host_str().clone()) {
+            (Some(no_proxy), Some(host)) => {
+                if no_proxy.split(",").collect::<Vec<_>>().contains(&host) {
+                    return None;
+                }
+            }
+            _ => {}
+        };
+
+        match url.scheme() {
+            "http" => http_proxy.clone(),
+            "https" => https_proxy.clone().or(http_proxy.clone()),
+            _ => None,
+        }
+    }));
 
     Ok(builder.build()?)
 }
