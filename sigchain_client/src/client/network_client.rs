@@ -59,7 +59,17 @@ fn string_not_empty(s: String) -> Result<String> {
 }
 
 fn string_to_url_default_http(s: String) -> Result<reqwest::Url> {
-    Ok(reqwest::Url::parse(&s).or(reqwest::Url::parse(&("http://".to_string() + &s)))?)
+    Ok(
+        reqwest::Url::parse(&s)
+            .map_err(Error::from)
+            .and_then(|u|
+                if !["http", "https"].contains(&u.scheme()) {
+                    Err("invalid scheme".into())
+                } else {
+                    Ok(u)
+                })
+            .or(reqwest::Url::parse(&("http://".to_string() + &s)))?
+    )
 }
 
 fn nonempty_env(k: &str) -> Result<String> {
