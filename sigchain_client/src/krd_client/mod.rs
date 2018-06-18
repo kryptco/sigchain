@@ -28,15 +28,7 @@ use std::fs::OpenOptions;
 use std::fs;
 
 pub fn kr_path() -> Result<PathBuf> {
-    let home_path = match env::var("SUDO_USER") {
-        Ok(sudo_user) => {
-            get_user_by_name(&sudo_user).map(|u| u.home_dir().to_path_buf())
-        }
-        _ => {
-            env::home_dir()
-        }
-    };
-
+    let home_path = env::home_dir();
     let mut kr_path = match home_path {
         Some(home_path) => { home_path }
         _ => {
