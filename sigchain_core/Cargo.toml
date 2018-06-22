@@ -8,7 +8,7 @@ base64 = "0.6.0"
 byteorder = "1.2.1"
 crc24 = "0.1.6"
 dotenv = "^0.10"
-error-chain = "^0.11.0"
+error-chain = { git = "https://github.com/rust-lang-nursery/error-chain" }
 lazy_static = "1.0.0"
 log = "0.3.8"
 rand = "0.3.16"
