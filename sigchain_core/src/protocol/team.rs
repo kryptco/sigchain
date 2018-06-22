@@ -191,7 +191,7 @@ impl IndirectInvitation {
         use sha256;
 
         let plaintext = serde_json::to_vec(&invite)?;
-        let ciphertext = crypto::secretbox::ephemeral_encrypt(plaintext);
+        let ciphertext = crypto::secretbox::ephemeral_encrypt(plaintext)?;
 
         let link = format!("krypton://join_team/{}",
                            base64::encode_config(&ciphertext.symmetric_key, base64::URL_SAFE));

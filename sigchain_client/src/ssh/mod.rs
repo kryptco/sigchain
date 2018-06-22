@@ -1,9 +1,13 @@
 use super::*;
 
+#[cfg(feature = "network_client")]
 mod pin;
+#[cfg(feature = "network_client")]
 pub use self::pin::*;
 
+#[cfg(feature = "network_client")]
 mod add;
+#[cfg(feature = "network_client")]
 pub use self::add::*;
 
 use sshwire::ssh::PublicKeyHeader;

@@ -464,7 +464,7 @@ pub trait OwnedKeyPair: traits::DBConnect + traits::Broadcast + traits::Identify
                         let body = serde_json::to_vec(&PlaintextBody::LogEncryptionKey(symmetric_key.clone()))
                             .map_err(|e| { error!("{:?}", e); e })?;
                         Ok(WrappedKey {
-                            ciphertext: box_::seal(&body, self.box_secret_key(), &box_pk),
+                            ciphertext: box_::seal(&body, self.box_secret_key(), &box_pk)?,
                             recipient_public_key: box_pk.0.to_vec(),
                         })
                     }).filter_map(Result::ok).collect::<Vec<_>>()
@@ -479,7 +479,7 @@ pub trait OwnedKeyPair: traits::DBConnect + traits::Broadcast + traits::Identify
                         let body = serde_json::to_vec(&PlaintextBody::LogEncryptionKey(symmetric_key.clone()))
                             .map_err(|e| { error!("{:?}", e); e })?;
                         Ok(WrappedKey {
-                            ciphertext: box_::seal(&body, self.box_secret_key(), &box_pk),
+                            ciphertext: box_::seal(&body, self.box_secret_key(), &box_pk)?,
                             recipient_public_key: box_pk.0.to_vec(),
                         })
                     }).filter_map(Result::ok).collect::<Vec<_>>()

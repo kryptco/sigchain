@@ -190,7 +190,7 @@ impl AndroidClient {
                 public_key: sign_key_pair.public_key_bytes().into(),
             },
             key_pair: sign_key_pair,
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair()?,
             db_connection: AndroidClient::db_conn(db_dir)?,
             http_client,
         };

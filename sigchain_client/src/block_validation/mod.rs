@@ -220,7 +220,7 @@ pub fn setup_team_block(domain: Option<&str>) -> (User, TestBlock) {
 pub fn setup_team(domain: Option<&str>) -> Result<(User, SignedMessage)> {
     let creator_sign_key_pair_seed = gen_sign_key_pair_seed()?;
     let creator_sign_key_pair = sign_keypair_from_seed(&creator_sign_key_pair_seed)?;
-    let creator_box_key_pair = gen_box_key_pair();
+    let creator_box_key_pair = gen_box_key_pair()?;
     let team_public_key: Vec<u8> = creator_sign_key_pair.public_key_bytes().into();
     let email_domain = domain.unwrap_or(TEST_EMAIL_DOMAIN);
     let creator = User {
@@ -264,7 +264,7 @@ pub fn generate_user(team_public_key: &[u8], member_id: u32) -> User {
 pub fn generate_user_with_email(team_public_key: &[u8], email: &str) -> Result<User> {
     let user_sign_key_pair_seed = gen_sign_key_pair_seed()?;
     let user_sign_key_pair = sign_keypair_from_seed(&user_sign_key_pair_seed)?;
-    let user_box_key_pair = gen_box_key_pair();
+    let user_box_key_pair = gen_box_key_pair()?;
 
     Ok(User {
         client: Client {
@@ -328,7 +328,7 @@ pub fn indir_invite_restriction(admin: &User, restriction: IndirectInvitationRes
 
     let invite_encryption = crypto::secretbox::ephemeral_encrypt(serde_json::to_vec(
         &admin_inv_users_secret,
-    ).unwrap());
+    ).unwrap()).unwrap();
 
     let admin_inv_users_msg = SignedMessage::from_message(
         Message {
@@ -510,7 +510,7 @@ pub fn add_user_indir(admin: &User, user: &User, last_block_hash: &[u8]) -> (Use
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: admin.client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),
@@ -551,7 +551,7 @@ pub fn add_domain_indir(admin: &User, user: &User, domain: &str, last_block_hash
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: admin.client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),

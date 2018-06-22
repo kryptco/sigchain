@@ -3,6 +3,7 @@ use super::*;
 error_chain!{
     errors {
         TryFromIntError {}
+        NilError {}
     }
     foreign_links {
         SerdeJson(serde_json::Error);
@@ -29,6 +30,12 @@ error_chain!{
 impl From<specified::ErrorKind> for Error {
     fn from(error_kind: specified::ErrorKind) -> Self {
         specified::Error::from(error_kind).into()
+    }
+}
+
+impl From<()> for Error {
+    fn from(_: ()) -> Self {
+        Error::from(ErrorKind::NilError{})
     }
 }
 

@@ -1,4 +1,5 @@
 pub use super::sodiumoxide::crypto::box_::curve25519xsalsa20poly1305 as ed25519_box;
+use super::sodiumoxide::init;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BoxKeyPair {
@@ -15,12 +16,13 @@ impl BoxKeyPair {
     }
 }
 
-pub fn seal(plaintext: &[u8], secret_key: &ed25519_box::SecretKey, public_key: &ed25519_box::PublicKey) -> Vec<u8> {
+pub fn seal(plaintext: &[u8], secret_key: &ed25519_box::SecretKey, public_key: &ed25519_box::PublicKey) -> Result<Vec<u8>> {
+    init()?;
     let nonce = ed25519_box::gen_nonce();
     let ciphertext = ed25519_box::seal(&plaintext, &nonce, public_key, secret_key);
 
     let nonce_and_ciphertext : Vec<u8> = [nonce.0.as_ref().into(), ciphertext.as_slice()].concat();
-    nonce_and_ciphertext
+    Ok(nonce_and_ciphertext)
 }
 
 pub fn open(nonce_and_ciphertext: &[u8], sender_public_key: &[u8], recipient_secret_key: &ed25519_box::SecretKey) -> Result<Vec<u8>> {
@@ -89,10 +91,11 @@ mod serde_secretkey {
 
 use super::Result;
 
-pub fn gen_box_key_pair() -> BoxKeyPair {
+pub fn gen_box_key_pair() -> super::Result<BoxKeyPair> {
+    init()?;
     let (public_key, secret_key) = ed25519_box::gen_keypair();
-    BoxKeyPair{
+    Ok(BoxKeyPair{
         public_key,
         secret_key,
-    }
+    })
 }

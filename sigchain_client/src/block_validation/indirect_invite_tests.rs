@@ -177,7 +177,7 @@ gen_test!(closed_indir_invite,
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: users[0].client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),
@@ -358,7 +358,7 @@ gen_test!(indir_invite_user_hijack,
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: users[0].client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),
@@ -421,7 +421,7 @@ gen_test!(admin_indir_invite_domain,
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: users[0].client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),
@@ -557,7 +557,7 @@ gen_test!(closed_indir_domain_invite,
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: users[0].client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),
@@ -590,7 +590,7 @@ gen_test!(indir_invite_nonce_accept,
     let temp_user = User {
         client: Client {
             sign_key_pair_seed: nonce_key_pair_seed.clone(),
-            box_key_pair: gen_box_key_pair(),
+            box_key_pair: gen_box_key_pair().unwrap(),
             team_public_key: users[0].client.team_public_key.clone(),
         },
         sign_key_pair: sign_keypair_from_seed(&nonce_key_pair_seed).unwrap(),

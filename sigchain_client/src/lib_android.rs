@@ -57,7 +57,7 @@ pub unsafe extern "C" fn Java_co_krypt_krypton_team_Native_createTeam(
             base64::decode_config(&create_team_args.email_challenge_nonce, base64::URL_SAFE)?;
 
         let sign_key_pair = gen_sign_key_pair()?;
-        let box_key_pair = gen_box_key_pair();
+        let box_key_pair = gen_box_key_pair()?;
         let pk : Vec<u8> = sign_key_pair.public_key_bytes().into();
 
         let creator_profile = &create_team_args.creator_profile;
@@ -144,7 +144,7 @@ pub unsafe extern "C" fn Java_co_krypt_krypton_team_Native_generateClient(
         let profile = args.profile;
 
         let sign_kp = gen_sign_key_pair()?;
-        let box_kp = gen_box_key_pair();
+        let box_kp = gen_box_key_pair()?;
 
         let conn = &AndroidClient::db_conn(dir.clone())?;
         db::CurrentTeam{
