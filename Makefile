@@ -20,7 +20,7 @@ SODIUM_FLAGS=SODIUM_STATIC=1 SODIUM_LIB_DIR="`PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 pkg
 endif
 
 libsigchain-with-dashboard: $(SODIUM_DEP) $(OPENSSL_DEP)
-	if [ "`cargo web --version`" != "cargo-web 0.6.10" ]; then echo "Please install cargo-web 0.6.10 with \`cargo install -f --version 0.6.10 cargo-web\`"; exit 1; fi
+	which cargo-web || (echo 'Please install cargo-web with `cargo install cargo-web`and make sure $$HOME/.cargo/bin is on your $$PATH' ; exit 1;)
 	# use rsync so that file modifed times are only updated when the contents change
 	cd dashboard_yew && cargo web deploy --release --target=wasm32-unknown-emscripten && rsync --checksum --delete -r ../target/deploy/* ../target/deploy-final
 	cd libsigchain && $(SODIUM_FLAGS) $(OPENSSL_FLAGS) cargo build ${CARGO_RELEASE}
