@@ -1,4 +1,4 @@
-use {env, serde, errors, serde_json, enclave_protocol};
+use {serde, errors, serde_json, enclave_protocol};
 use super::Result;
 
 extern crate hyperlocal;
@@ -14,9 +14,7 @@ use self::hyper::{Client};
 extern crate tokio_core;
 use self::tokio_core::reactor::Core;
 
-extern crate users;
-use self::users::get_user_by_name;
-use self::users::os::unix::UserExt;
+extern crate dirs;
 
 use std::path::PathBuf;
 
@@ -28,7 +26,7 @@ use std::fs::OpenOptions;
 use std::fs;
 
 pub fn kr_path() -> Result<PathBuf> {
-    let home_path = env::home_dir();
+    let home_path = dirs::home_dir();
     let mut kr_path = match home_path {
         Some(home_path) => { home_path }
         _ => {

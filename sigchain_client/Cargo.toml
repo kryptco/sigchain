@@ -14,6 +14,7 @@ byteorder = "1.1.0"
 clap = "2.29.2"
 colored = "1.5.2"
 crc24 = "0.1.6"
+dirs = "1.0.2"
 dotenv = "0.9.0"
 env_logger = "0.5.2"
 error-chain = {git = "https://github.com/rust-lang-nursery/error-chain"}
